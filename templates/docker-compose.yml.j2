@@ -1,0 +1,35 @@
+#jinja2: trim_blocks: True, lstrip_blocks: True
+# {{ ansible_managed }}
+# {{ template_fullpath | regex_replace('^' ~ role_path, role_path | basename) }}
+
+name: {{ docker_project_slug }}
+
+services:
+
+  flood:
+    image: jesec/flood:{{ flood_version }}
+    container_name: {{ docker_project_slug }}
+    restart: {{ docker_project_restart }}
+
+    {{ docker_project_service_network_options | indent(4) }}
+
+    {{ docker_project_service_additional_options | indent(4) }}
+
+    environment:
+      HOME: /config
+      {% for item in flood_environment_options | default({}, true) | dict2items %}
+      FLOOD_OPTION_{{ item.key }}: {{ item.value }}
+      {% endfor %}
+
+    volumes:
+      - ./config:/config
+      {% for item in flood_volumes | default([], true) %}
+      - {{ item }}
+      {% endfor %}
+
+    labels:
+      {{ traefik_project_base_labels | indent(6) }}
+
+{{ docker_project_networks }}
+
+{{ docker_project_compose_additional_options }}

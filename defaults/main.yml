@@ -1,0 +1,77 @@
+---
+
+# Docker project variables
+
+flood_project_name: flood
+
+# Port targeted by Traefik router
+flood_traefik_loadbalancer_server_port: "{{ flood_environment_options.port | default(3000) }}"
+
+# Main service additional docker-compose options (ex: cpu_shares, deploy, ...)
+flood_service_additional_options: |
+  #ports:
+  #  - 3000:3000
+
+
+# Flood project variables
+
+# jesec/flood image version
+flood_version: latest
+
+# Flood Docker environment variables
+# https://github.com/jesec/flood/blob/master/config.ts
+flood_environment_options:
+
+  auth: default # Access control and user management method (default | none)
+
+  # baseuri:                            # This URI will prefix all of Flood's HTTP requests
+  # rundir:  /config/.local/share/flood # Where to store Flood's runtime files (eg. database)
+  # host:    127.0.0.1                  # The host that Flood should listen for web connections on
+  # port:    3000                       # The port that Flood should listen for web connections on
+
+  # allowedpath: # Allowed path for file operations, can be called multiple times
+
+  # secret:                   # A unique secret, a random one will be generated if not provided
+  # disable-rate-limit: false # Disable api request limit except for login
+
+  ## Deluge
+  # dehost:   # Host of Deluge RPC interface
+  # deport:   # Port of Deluge RPC interface
+  # deuser:   # Username of Deluge RPC interface
+  # depass:   # Password of Deluge RPC interface
+
+  ## rTorrent
+  # rthost:   # Host of rTorrent's SCGI interface
+  # rtport:   # Port of rTorrent's SCGI interface
+  # rtsocket: # Path to rTorrent's SCGI unix socket
+
+  ## qBittorrent
+  # qburl:    # URL to qBittorrent Web API
+  # qbuser:   # Username of qBittorrent Web API
+  # qbpass:   # Password of qBittorrent Web API
+
+  ## Transmission
+  # trurl:    # URL to Transmission RPC interface
+  # truser:   # Username of Transmission RPC interface
+  # trpass:   # Password of Transmission RPC interface
+
+  ## SSL settings
+  # ssl:     false # Enable SSL, key.pem and fullchain.pem needed in runtime directory
+  # sslkey:        # Depends on ssl: Absolute path to private key for SSL
+  # sslcert:       # Depends on ssl: Absolute path to fullchain cert for SSL
+
+  ## Advanced settings
+  # assets:           true           # ADVANCED: Serve static assets
+  # dbclean:          1000 * 60 * 60 # ADVANCED: Interval between database purge
+  # maxhistorystates: 30             # ADVANCED: Number of records of torrent download and upload speeds
+  # clientpoll:       1000 * 2       # ADVANCED: How often (in ms) Flood will request the torrent list
+  # clientpollidle:   1000 * 60 * 15 # ADVANCED: How often (in ms) Flood will request the torrent list when no user is present
+  # rtorrent:         false          # ADVANCED: rTorrent daemon managed by Flood
+  # rtconfig:                        # ADVANCED: rtorrent.rc for managed rTorrent daemon
+
+# Volumes for filesystem operations
+# ⚠️ Flood must have the same filesystem view as the torrent client
+flood_volumes:
+# Ex:
+#  - /example/downloads:/downloads
+#  - /example/watch:/watch
