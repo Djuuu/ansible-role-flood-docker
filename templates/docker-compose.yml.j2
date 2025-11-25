@@ -22,7 +22,7 @@ services:
       {% endfor %}
 
     volumes:
-      - ./config:/config
+      - ./flood-config:/config
       {% for item in flood_volumes | default([], true) %}
       - {{ item }}
       {% endfor %}
