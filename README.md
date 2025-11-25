@@ -33,6 +33,11 @@ flood_project_name: flood
 # Port targeted by Traefik router
 flood_traefik_loadbalancer_server_port: "{{ flood_environment_options.port | default(3000) }}"
 
+# Main service additional docker-compose options (ex: cpu_shares, deploy, ...)
+flood_service_additional_options: |
+  #ports:
+  #  - 3000:3000
+
 # Flood project variables
 
 # jesec/flood image version
@@ -116,6 +121,45 @@ Example Playbook
   roles:
     - djuuu.flood_docker
 ```
+
+### Integration in your BitTorrent client's Docker Compose project
+
+The `template_service` task will register a `flood_service_yaml` variable that can be used in other projects.
+
+Use the following variables to specify Flood's backend service dependency 
+(Docker Compose [`depends_on`](https://docs.docker.com/reference/compose-file/services/#depends_on) attribute): 
+- `flood_backend_service`:  
+  key of your BitTorrent backend service in the main _docker-compose.yml_
+- `flood_backend_condition`:  
+  condition under which dependency is considered satisfied (defaults to `service_started`)
+
+* `example_playbook.yml`
+  ```yaml
+  - hosts: example
+    gather_facts: false
+  
+    pre_tasks:
+      - name: Template Flood service yaml
+        vars:
+          flood_backend_service: example 
+          flood_backend_condition: service_healthy # defaults to service_started
+        ansible.builtin.include_role:
+          name: djuuu.flood_docker
+          tasks_from: template_service
+  
+    roles:
+      - example_docker_role
+  ```
+
+* `example_docker_role/templates/docker-compose.yml.j2`
+  ```yaml
+  services:
+
+    example:
+      # ...
+
+    {{ flood_service_yaml | default('') | indent(2) }}
+  ```
 
 License
 -------

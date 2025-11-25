@@ -1,0 +1,18 @@
+---
+
+- name: Template Flood service yaml
+  vars:
+    _backend:
+      - key: "{{ flood_backend_service | default('undefined') }}"
+        value: { condition: "{{ flood_backend_condition | default('service_started') }}", restart: true }
+    _depends_on: { depends_on: "{{ _backend | items2dict }}" }
+
+    docker_project_service_additional_options: |
+      {{ flood_service_additional_options | default('') }}
+      {{ _depends_on | to_nice_yaml(indent=2,sort_keys=false) }}
+
+    flood_compose_data: "{{ lookup('ansible.builtin.template', 'docker-compose.yml.j2') | from_yaml }}"
+    flood_service_data: { flood: "{{ flood_compose_data.services.flood }}" }
+
+  ansible.builtin.set_fact:
+    flood_service_yaml: "{{ flood_service_data | to_nice_yaml(indent=2,sort_keys=false) }}"
